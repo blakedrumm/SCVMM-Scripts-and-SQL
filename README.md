@@ -8,7 +8,7 @@ ___
 # Projects
 
 ### SCVMM Data Collector
-![DataCollector](/media/git-guidance/scvmm-data-collector.png) \
+![DataCollector](/media/git-guidance/vmm-data-collector.png) \
 [![Latest Version](https://img.shields.io/github/v/release/blakedrumm/SCVMM-Scripts-and-SQL)](https://github.com/blakedrumm/SCVMM-Scripts-and-SQL/releases/latest) \
 [![Direct Download Link](https://img.shields.io/badge/Download%20Link-Download-blue?style=for-the-badge&color=blue)](https://github.com/blakedrumm/SCVMM-Scripts-and-SQL/releases/latest/download/SCVMM-DataCollector.zip) \
 [![Alternative Download Link](https://img.shields.io/badge/Download%20Link-Alternative%20Download-blue?style=for-the-badge&color=blue)](https://files.blakedrumm.com/SCVMM-DataCollector.zip) \
