@@ -1,0 +1,1 @@
+SELECT * FROM [dbo].[tbl_ADHC_AgentServer] WITH (NOLOCK)

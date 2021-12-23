@@ -1,0 +1,1 @@
+SELECT * FROM [dbo].[tbl_NetMan_LogicalSwitch] WITH (NOLOCK)

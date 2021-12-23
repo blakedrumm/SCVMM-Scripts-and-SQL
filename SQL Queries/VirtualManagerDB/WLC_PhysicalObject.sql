@@ -1,0 +1,1 @@
+SELECT * FROM [dbo].[tbl_WLC_PhysicalObject] WITH (NOLOCK)

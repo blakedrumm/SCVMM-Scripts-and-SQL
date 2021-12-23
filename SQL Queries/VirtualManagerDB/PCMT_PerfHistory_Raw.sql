@@ -1,0 +1,1 @@
+SELECT * FROM [dbo].[tbl_PCMT_PerfHistory_Raw] WITH (NOLOCK)

@@ -1,0 +1,1 @@
+SELECT * FROM [dbo].[tbl_WLC_VAdapter] WITH (NOLOCK)

@@ -1,0 +1,1 @@
+SELECT * FROM [dbo].[tbl_VMM_GlobalSetting] WITH (NOLOCK)
