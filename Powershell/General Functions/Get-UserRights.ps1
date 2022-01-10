@@ -17,12 +17,12 @@
 	.EXAMPLE
         Usage:
             Get Local User Account Rights and output to text in console:
-				PS C:\> .\Get-UserRights.ps1
+		PS C:\> .\Get-UserRights.ps1
             
-            Get Remote ComputerName User Account Rights:
+            Get Remote Server User Account Rights:
                 PS C:\> .\Get-UserRights.ps1 -ComputerName SQL.contoso.com
 
-            Get Local Machine and Multiple ComputerName User Account Rights:
+            Get Local Machine and Multiple Server User Account Rights:
                 PS C:\> .\Get-UserRights.ps1 -ComputerName $env:COMPUTERNAME, SQL.contoso.com
 
             Output to CSV in 'C:\Temp':
@@ -43,15 +43,15 @@
 param
 (
 	[Parameter(Position = 0,
-			   HelpMessage = 'Location to store the Output File. Set the Type with FileOutputType')]
+			   HelpMessage = '(ex. C:\Temp) Location to store the Output File. Set the Type with FileOutputType')]
 	[string]$FileOutputPath,
 	[Parameter(Position = 1,
-			   HelpMessage = 'Set the type of file you would like to output as. Combine with the OutputPath parameter.')]
+			   HelpMessage = '(CSV or Text) Set the type of file you would like to output as. Combine with the OutputPath parameter.')]
 	[ValidateSet('CSV', 'Text')]
 	[string]$FileOutputType,
 	[Parameter(ValueFromPipeline = $true,
 			   Position = 2,
-			   HelpMessage = 'Comma seperated list of servers you want to run this script against. To run locally, run without this switch.')]
+			   HelpMessage = '(Server1, Server2) Comma seperated list of servers you want to run this script against. To run locally, run without this switch. This argument accepts values from the pipeline.')]
 	[Alias('server')]
 	[array]$ComputerName
 )
