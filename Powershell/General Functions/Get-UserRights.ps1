@@ -12,7 +12,7 @@
 		Set the type of file you would like to output as. Combine with the OutputPath parameter.
 	
 	.PARAMETER ComputerName
-		Comma seperated list of servers you want to run this script against. To run locally, run without this switch.
+		Comma separated list of servers you want to run this script against. To run locally, run without this switch.
 	
 	.EXAMPLE
         Usage:
@@ -36,7 +36,7 @@
 
 		Author: Blake Drumm (blakedrumm@microsoft.com)
 		First Created on: June 10th, 2021
-		Last Modified on: January 9th, 2022
+		Last Modified on: January 10th, 2022
 #>
 [CmdletBinding()]
 [OutputType([string])]
@@ -51,7 +51,7 @@ param
 	[string]$FileOutputType,
 	[Parameter(ValueFromPipeline = $true,
 			   Position = 2,
-			   HelpMessage = '(Server1, Server2) Comma seperated list of servers you want to run this script against. To run locally, run without this switch. This argument accepts values from the pipeline.')]
+			   HelpMessage = '(Server1, Server2) Comma separated list of servers you want to run this script against. To run locally, run without this switch. This argument accepts values from the pipeline.')]
 	[Alias('server')]
 	[array]$ComputerName
 )
@@ -98,15 +98,15 @@ PROCESS
 		param
 		(
 			[Parameter(Position = 0,
-					   HelpMessage = 'Location to store the Output File. Set the Type with FileOutputType')]
+					   HelpMessage = '(ex. C:\Temp) Location to store the Output File. Set the Type with FileOutputType')]
 			[string]$FileOutputPath,
 			[Parameter(Position = 1,
-					   HelpMessage = 'Set the type of file you would like to output as. Combine with the OutputPath parameter.')]
+					   HelpMessage = '(CSV or Text) Set the type of file you would like to output as. Combine with the OutputPath parameter.')]
 			[ValidateSet('CSV', 'Text')]
-			[string]$FileOutputType = 'Text',
+			[string]$FileOutputType,
 			[Parameter(ValueFromPipeline = $true,
 					   Position = 2,
-					   HelpMessage = 'Comma seperated list of servers you want to run this script against. To run locally, run without this switch.')]
+					   HelpMessage = '(Server1, Server2) Comma separated list of servers you want to run this script against. To run locally, run without this switch. This argument accepts values from the pipeline.')]
 			[Alias('server')]
 			[array]$ComputerName
 		)
