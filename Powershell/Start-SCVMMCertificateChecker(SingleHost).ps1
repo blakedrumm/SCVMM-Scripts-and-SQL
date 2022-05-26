@@ -5,8 +5,7 @@
 ## DO NOT MODIFY BELOW THIS LINE
 
 # Collecting Host certificates from the VMM server's trusted people store
-Set-location Cert:\LocalMachine\TrustedPeople
-[array]$SCCertsRaw = Get-ChildItem
+[array]$SCCertsRaw = Get-ChildItem "Cert:\LocalMachine\TrustedPeople"
 [array]$SCCerts = @()
 if ($names)
 {
@@ -30,9 +29,7 @@ if ($SCCerts.count -gt 0)
 		{
 			Write-Host "Getting the Host Certificate" -ForegroundColor Gray
 			$ClientCerts = invoke-command -ComputerName $SCCert.DNSNameList -ScriptBlock {
-				Set-Location Cert:\LocalMachine\My;
-				$Certs = Get-ChildItem | where { $_.FriendlyName -like 'SCVMM_CERTIFICATE_KEY_CONTAINER*' };
-				$Certs;
+				Get-ChildItem "Cert:\LocalMachine\My" | where { $_.FriendlyName -like 'SCVMM_CERTIFICATE_KEY_CONTAINER*' };
 			}
 			Write-Host "Comparing Host and VMM Cerificates"
 			if ($ClientCerts.SerialNumber -ne $SCCert.SerialNumber)
@@ -62,4 +59,8 @@ if ($SCCerts.count -gt 0)
 			Write-Host ""
 		}
 	}
+}
+else
+{
+	Write-Host "Did not find any certificates for SCVMM!" -ForegroundColor Red
 }
