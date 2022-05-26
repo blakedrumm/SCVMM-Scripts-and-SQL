@@ -1,4 +1,4 @@
-#collecting Host certificates from the VMM server's trusted people store
+#Collecting Host certificates from the VMM server's trusted people store
 
 Set-location Cert:\LocalMachine\TrustedPeople
 $SCCerts = GCI
