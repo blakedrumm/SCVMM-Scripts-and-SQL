@@ -29,7 +29,7 @@ if ($SCCerts.count -gt 0)
 			}
 			catch
 			{
-				Write-Warning "`t`tUnable to connect to $($SCCert.DNSNameList), skipping"
+				Write-Warning "Unable to connect to $($SCCert.DNSNameList), skipping"
 				Write-Host ' '
 				continue
 			}
