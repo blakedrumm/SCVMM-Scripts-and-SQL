@@ -148,7 +148,7 @@ PROCESS
 }
 END
 {
-	if (Get-Command 'explorer.exe')
+	if ($(try { Get-Command 'explorer.exe' -ErrorAction Stop } catch { }))
 	{
 		Start-Process -FilePath 'C:\Windows\explorer.exe' -ArgumentList "/select, $destfilename"
 	}
