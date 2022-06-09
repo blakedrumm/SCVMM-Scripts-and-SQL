@@ -20,7 +20,8 @@
 		PS C:\> .\Start-SCVMMETLTrace.ps1 -Sleep 120
 	
 	.NOTES
-		Additional information about the file.
+		AUTHOR: Blake Drumm (blakedrumm@microsoft.com)
+		CREATED: July 9th, 2022
 #>
 [CmdletBinding()]
 param
