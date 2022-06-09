@@ -61,12 +61,12 @@ if ($SCCerts.count -gt 0)
 				}
 				else
 				{
-					Write-Host "`t`tUnable to detect Expiration" -ForegroundColor DarkMagenta
+					Write-Host "`t`tUnknown issue, cannot detect Expiration" -ForegroundColor Yellow
 				}
 			}
 			else
 			{
-				Write-Host "`t`tUnable to detect Expiration" -ForegroundColor DarkMagenta
+				Write-Host "`t`tUnable to detect Expiration" -ForegroundColor Yellow
 			}
 			
 			
