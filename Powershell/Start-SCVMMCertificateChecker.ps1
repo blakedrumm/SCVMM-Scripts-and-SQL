@@ -35,7 +35,15 @@ if ($SCCerts.count -gt 0)
 			{
 				Write-Host "Certificates Match" -ForegroundColor Green
 			}
-			Write-Host ""
+			if ($ClientCerts.NotAfter -gt $(Date))
+			{
+				Write-Host "Expiration: $($ClientCerts.NotAfter)" -ForegroundColor Green
+			}
+			else
+			{
+				Write-Host "Expiration: $($ClientCerts.NotAfter)" -ForegroundColor Red
+			}
+			
 		}
 	}
 }
