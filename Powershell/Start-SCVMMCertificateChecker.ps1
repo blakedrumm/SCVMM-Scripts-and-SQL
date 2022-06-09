@@ -1,5 +1,4 @@
 #Modified by: Blake Drumm (blakedrumm@microsoft.com)
-#Modified on: June 9th, 2022
 #Collecting Host certificates from the VMM server's trusted people store
 $SCCerts = Get-ChildItem "Cert:\LocalMachine\TrustedPeople" | Sort-Object
 [bool]$Reassociate = $false
@@ -38,8 +37,8 @@ if ($SCCerts.count -gt 0)
 			if ($($ClientCerts.Thumbprint | Select-Object -First 1) -notmatch $($SCCert.Thumbprint | Select-Object -First 1))
 			{
 				Write-Host "`t`tThe Thumbprint doesn't match" -ForegroundColor Red
-				Write-Host "`t`tHost Cert Thumbprint:       $($ClientCerts.Thumbprint | Select-Object -First 1)" -ForegroundColor Red
-				Write-Host "`t`tVMM Server Cert Thumbprint: $($SCCert.Thumbprint)" -ForegroundColor Red
+				Write-Host "`t`t   Host Cert Thumbprint:       $($ClientCerts.Thumbprint | Select-Object -First 1)" -ForegroundColor Red
+				Write-Host "`t`t   VMM Server Cert Thumbprint: $($SCCert.Thumbprint)" -ForegroundColor Red
 				if ($Reassociate)
 				{
 					Write-Host "`t`tReassociating the host with VMM to sync the cert" -ForegroundColor Yellow
@@ -50,14 +49,26 @@ if ($SCCerts.count -gt 0)
 			{
 				Write-Host "`t`tCertificates Match" -ForegroundColor Green
 			}
-			if ($ClientCerts.NotAfter -ge $(Date))
+			if ($ClientCerts.NotAfter)
 			{
-				Write-Host "`t`tExpiration: $($ClientCerts.NotAfter | Select-Object -First 1)" -ForegroundColor Green
+				if ($($ClientCerts.NotAfter | Select-Object -First 1) -ge $(Date))
+				{
+					Write-Host "`t`tExpiration: $($ClientCerts.NotAfter | Select-Object -First 1)" -ForegroundColor Green
+				}
+				elseif ($($ClientCerts.NotAfter | Select-Object -First 1) -lt $(Date))
+				{
+					Write-Host "`t`tExpired: $($ClientCerts.NotAfter | Select-Object -First 1)" -ForegroundColor Red
+				}
+				else
+				{
+					Write-Host "`t`tUnable to detect Expiration" -ForegroundColor DarkMagenta
+				}
 			}
 			else
 			{
-				Write-Host "`t``tExpired: $($ClientCerts.NotAfter)" -ForegroundColor Red
+				Write-Host "`t`tUnable to detect Expiration" -ForegroundColor DarkMagenta
 			}
+			
 			
 		}
 		Write-Host ' '
