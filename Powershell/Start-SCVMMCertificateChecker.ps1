@@ -1,6 +1,7 @@
 #Modified by: Blake Drumm (blakedrumm@microsoft.com)
+#Modified on: June 9th, 2022
 #Collecting Host certificates from the VMM server's trusted people store
-$SCCerts = Get-ChildItem "Cert:\LocalMachine\TrustedPeople"
+$SCCerts = Get-ChildItem "Cert:\LocalMachine\TrustedPeople" | Sort-Object
 [bool]$Reassociate = $false
 
 #Request VMM administrator credentials for Invoke-Command against Hosts
@@ -49,13 +50,13 @@ if ($SCCerts.count -gt 0)
 			{
 				Write-Host "`t`tCertificates Match" -ForegroundColor Green
 			}
-			if ($ClientCerts.NotAfter -gt $(Date))
+			if ($ClientCerts.NotAfter -ge $(Date))
 			{
 				Write-Host "`t`tExpiration: $($ClientCerts.NotAfter | Select-Object -First 1)" -ForegroundColor Green
 			}
 			else
 			{
-				Write-Host "`t`Expired: $($ClientCerts.NotAfter | Select-Object -First 1)" -ForegroundColor Red
+				Write-Host "`t``tExpired: $($ClientCerts.NotAfter)" -ForegroundColor Red
 			}
 			
 		}
