@@ -30,13 +30,14 @@ if ($SCCerts.count -gt 0)
 			catch
 			{
 				Write-Warning "`t`tUnable to connect to $($SCCert.DNSNameList), skipping"
+				Write-Host ' '
 				continue
 			}
 			Write-Host "`t`tComparing Host and VMM Cerificates" -ForegroundColor Gray
-			if ($ClientCerts.Thumbprint -notmatch $($SCCert.Thumbprint | Select-Object -First 1))
+			if ($($ClientCerts.Thumbprint | Select-Object -First 1) -notmatch $($SCCert.Thumbprint | Select-Object -First 1))
 			{
 				Write-Host "`t`tThe Thumbprint doesn't match" -ForegroundColor Red
-				Write-Host "`t`tHost Cert Thumbprint: $($ClientCerts.Thumbprint | Select-Object -First 1)" -ForegroundColor Red
+				Write-Host "`t`tHost Cert Thumbprint:       $($ClientCerts.Thumbprint | Select-Object -First 1)" -ForegroundColor Red
 				Write-Host "`t`tVMM Server Cert Thumbprint: $($SCCert.Thumbprint)" -ForegroundColor Red
 				if ($Reassociate)
 				{
