@@ -17,7 +17,7 @@
 		Optional: Seconds to sleep after starting an ETL Trace
 	
 	.EXAMPLE
-		PS C:\> .\
+		PS C:\> .\Start-SCVMMETLTrace.ps1 -Sleep 120
 	
 	.NOTES
 		Additional information about the file.
@@ -145,9 +145,14 @@ PROCESS
 	{
 		Write-Error "Error creating zip file."
 	}
+	if (Get-Command 'explorer.exe')
+	{
+		Start-Process -FilePath 'C:\Windows\explorer.exe' -ArgumentList "/select, $destfilename"
+	}
 }
 END
 {
-  start C:\Windows\explorer.exe -ArgumentList "/select, $destfilename"
 	Write-Output "$(Get-TimeStamp)Script has completed!"
 }
+
+
