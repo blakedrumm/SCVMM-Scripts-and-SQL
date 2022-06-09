@@ -145,14 +145,12 @@ PROCESS
 	{
 		Write-Error "Error creating zip file."
 	}
+}
+END
+{
 	if (Get-Command 'explorer.exe')
 	{
 		Start-Process -FilePath 'C:\Windows\explorer.exe' -ArgumentList "/select, $destfilename"
 	}
-}
-END
-{
 	Write-Output "$(Get-TimeStamp)Script has completed!"
 }
-
-
