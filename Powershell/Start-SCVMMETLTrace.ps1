@@ -181,5 +181,5 @@ if ($OutputDirectory -or $OutputZipName -or $Sleep)
 }
 else
 {
-	Start-SCVMMETLTrace -Sleep 10
+	Start-SCVMMETLTrace
 }
