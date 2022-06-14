@@ -279,7 +279,7 @@ function Start-SCVMMETLTrace
 	}
 	$InnerSCVMMETLTraceFunction = "function Inner-ETLTraceFunction { ${function:Inner-ETLTraceFunction} }"
 	$ETLTraceFileNameTime = Get-Date -UFormat "%m_%d_%Y_%l-%M-%p"
-	$OutputDirectory
+	
 	if ($Servers)
 	{
 		foreach ($Server in $Servers)
