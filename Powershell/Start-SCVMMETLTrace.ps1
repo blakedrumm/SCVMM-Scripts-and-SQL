@@ -354,5 +354,5 @@ else
 		so you do not fill the drive with ETL Trace Logging for VMM.
 			Start-SCVMMETLTrace -Servers VMMHost1.contoso.com, VMMHost2.contoso.com -Sleep 120 -OutputDirectory C:\temp\VMM-ETLTrace -CircularLogging
 	#>
-	Start-SCVMMETLTrace -Servers AINSLEBL-H1.northamerica.corp.microsoft.com, JOCARVA-H2.northamerica.corp.microsoft.com -Sleep 1 -CircularLogging
+	Start-SCVMMETLTrace
 }
