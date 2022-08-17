@@ -1,49 +1,50 @@
 <#
-	.SYNOPSIS
-		Get Local User Account rights from the Local Security Policy
-	
-	.DESCRIPTION
-		This script will gather the local security policy User Rights from the local, or a remote machine.
-	
-	.PARAMETER ComputerName
-		Comma separated list of servers you want to run this script against. To run locally, run without this switch.
-	
-	.PARAMETER FileOutputPath
-		Location to store the Output File. Set the Type (CSV or Text) with FileOutputType
-	
-	.PARAMETER FileOutputType
-		Set the type of file you would like to output as. Combine with the OutputPath parameter.
-	
-	.PARAMETER PassThru
-		Output as an object that you can manipulate / access.
-	
-	.EXAMPLE
-		Usage:
-		Get Local User Account Rights and output to text in console:
-		PS C:\> .\Get-UserRights.ps1
-		
-		Get Remote Server User Account Rights:
-		PS C:\> .\Get-UserRights.ps1 -ComputerName SQL.contoso.com
-		
-		Get Local Machine and Multiple Server User Account Rights:
-		PS C:\> .\Get-UserRights.ps1 -ComputerName $env:COMPUTERNAME, SQL.contoso.com
-		
-		Output to CSV in 'C:\Temp':
-		PS C:\> .\Get-UserRights.ps1 -FileOutputPath C:\Temp -FileOutputType CSV
-		
-		Output to Text in 'C:\Temp':
-		PS C:\> .\Get-UserRights.ps1 -FileOutputPath C:\Temp -FileOutputType Text
-
-		Pass thru object:
-		PS C:\> .\Get-UserRights.ps1 -ComputerName SQL.contoso.com -PassThru | Where {$_.Principal -match "Administrator"}
-	
-	.NOTES
-		This script is located in the following GitHub Repository: https://github.com/blakedrumm/SCOM-Scripts-and-SQL
-		Exact location: https://github.com/blakedrumm/SCOM-Scripts-and-SQL/blob/master/Powershell/General%20Functions/Get-UserRights.ps1
-		
-		Author: Blake Drumm (blakedrumm@microsoft.com)
-		First Created on: June 10th, 2021
-		Last Modified on: January 10th, 2022
+    .SYNOPSIS
+        Get Local User Account rights from the Local Security Policy
+    
+    .DESCRIPTION
+        This script will gather the local security policy User Rights from the local, or a remote machine.
+    
+    .PARAMETER ComputerName
+        Comma separated list of servers you want to run this script against. To run locally, run without this switch.
+    
+    .PARAMETER FileOutputPath
+        Location to store the Output File. Set the Type (CSV or Text) with FileOutputType
+    
+    .PARAMETER FileOutputType
+        Set the type of file you would like to output as. Combine with the OutputPath parameter.
+    
+    .PARAMETER PassThru
+        Output as an object that you can manipulate / access.
+    
+    .EXAMPLE
+        Usage:
+        Get Local User Account Rights and output to text in console:
+        PS C:\> .\Get-UserRights.ps1
+        
+        Get Remote Server User Account Rights:
+        PS C:\> .\Get-UserRights.ps1 -ComputerName SQL.contoso.com
+        
+        Get Local Machine and Multiple Server User Account Rights:
+        PS C:\> .\Get-UserRights.ps1 -ComputerName $env:COMPUTERNAME, SQL.contoso.com
+        
+        Output to CSV in 'C:\Temp':
+        PS C:\> .\Get-UserRights.ps1 -FileOutputPath C:\Temp -FileOutputType CSV
+        
+        Output to Text in 'C:\Temp':
+        PS C:\> .\Get-UserRights.ps1 -FileOutputPath C:\Temp -FileOutputType Text
+        Pass thru object:
+        PS C:\> .\Get-UserRights.ps1 -ComputerName SQL.contoso.com -PassThru | Where {$_.Principal -match "Administrator"}
+    
+    .NOTES
+        This script is located in the following GitHub Repository: https://github.com/blakedrumm/SCOM-Scripts-and-SQL
+        Exact location: https://github.com/blakedrumm/SCOM-Scripts-and-SQL/blob/master/Powershell/General%20Functions/Get-UserRights.ps1
+        
+        Blog post: https://blakedrumm.com/blog/set-and-check-user-rights-assignment/
+        
+        Author: Blake Drumm (blakedrumm@microsoft.com)
+        First Created on: June 10th, 2021
+        Last Modified on: August 15th, 2022
 #>
 [CmdletBinding()]
 [OutputType([string])]
@@ -59,7 +60,7 @@ param
 	[string]$FileOutputPath,
 	[Parameter(Position = 2,
 			   HelpMessage = '(CSV or Text) Set the type of file you would like to output as. Combine with the OutputPath parameter.')]
-	[ValidateSet('CSV', 'Text')]
+	[ValidateSet('CSV', 'Text', '')]
 	[string]$FileOutputType,
 	[Parameter(Position = 3,
 			   HelpMessage = 'Output as an object that you can manipulate / access.')]
@@ -76,7 +77,6 @@ BEGIN
 ===================================================================
 "@
 	}
-	
 	$checkingpermission = "Checking for elevated permissions..."
 	$scriptout += $checkingpermission
 	if (!$PassThru)
@@ -102,7 +102,6 @@ BEGIN
 			Write-Host $permissiongranted
 		}
 	}
-	
 	Function Time-Stamp
 	{
 		$TimeStamp = Get-Date -Format "MM/dd/yyyy hh:mm:ss tt"
@@ -129,8 +128,10 @@ PROCESS
 			[Parameter(Position = 1,
 					   HelpMessage = '(ex. C:\Temp) Location to store the Output File. Set the Type with FileOutputType')]
 			[string]$FileOutputPath,
-			[Parameter(Position = 2,
+			[Parameter(Mandatory = $false,
+					   Position = 2,
 					   HelpMessage = '(CSV or Text) Set the type of file you would like to output as. Combine with the OutputPath parameter.')]
+			[ValidateSet('CSV', 'Text', '')]
 			[string]$FileOutputType,
 			[Parameter(Position = 3,
 					   HelpMessage = 'Output as an object that you can manipulate / access.')]
@@ -151,10 +152,10 @@ PROCESS
 			if ($ComputerName -notmatch $env:COMPUTERNAME)
 			{
 				$localrights += Invoke-Command -ScriptBlock {
+					param ([int]$VerbosePreference)
 					function Get-SecurityPolicy
 					{
 						#requires -version 2
-						
 						# Fail script if we can't find SecEdit.exe
 						$SecEdit = Join-Path ([Environment]::GetFolderPath([Environment+SpecialFolder]::System)) "SecEdit.exe"
 						if (-not (Test-Path $SecEdit))
@@ -162,7 +163,7 @@ PROCESS
 							Write-Error "File not found - '$SecEdit'" -Category ObjectNotFound
 							return
 						}
-						
+						Write-Verbose "Found Executable: $SecEdit"
 						# LookupPrivilegeDisplayName Win32 API doesn't resolve logon right display
 						# names, so use this hashtable
 						$UserLogonRights = @{
@@ -177,7 +178,6 @@ PROCESS
 							"SeRemoteInteractiveLogonRight"	    = "Allow log on through Remote Desktop Services"
 							"SeServiceLogonRight"			    = "Log on as a service"
 						}
-						
 						# Create type to invoke LookupPrivilegeDisplayName Win32 API
 						$Win32APISignature = @'
 [DllImport("advapi32.dll", SetLastError=true)]
@@ -190,7 +190,6 @@ public static extern bool LookupPrivilegeDisplayName(
 );
 '@
 						$AdvApi32 = Add-Type advapi32 $Win32APISignature -Namespace LookupPrivilegeDisplayName -PassThru
-						
 						# Use LookupPrivilegeDisplayName Win32 API to get display name of privilege
 						# (except for user logon rights)
 						function Get-PrivilegeDisplayName
@@ -233,7 +232,6 @@ public static extern bool LookupPrivilegeDisplayName(
 							$out = New-Object PSObject -Property $result | Select-Object $order
 							return $out
 						}
-						
 						# Translates a SID in the form *S-1-5-... to its account name;
 						function Get-AccountName
 						{
@@ -247,7 +245,6 @@ public static extern bool LookupPrivilegeDisplayName(
 							}
 							catch { $principal }
 						}
-						
 						$TemplateFilename = Join-Path ([IO.Path]::GetTempPath()) ([IO.Path]::GetRandomFileName())
 						$LogFilename = Join-Path ([IO.Path]::GetTempPath()) ([IO.Path]::GetRandomFileName())
 						$StdOut = & $SecEdit /export /cfg $TemplateFilename /areas USER_RIGHTS /log $LogFilename
@@ -265,17 +262,14 @@ public static extern bool LookupPrivilegeDisplayName(
 								$Principals = $_.Matches[0].Groups[2].Value -split ','
 								foreach ($Principal in $Principals)
 								{
-									
 									$nRow = $dtable.NewRow()
 									$nRow.Privilege = $Privilege
 									$nRow.PrivilegeName = Get-PrivilegeDisplayName $Privilege
 									$nRow.Principal = Get-AccountName $Principal
 									$nRow.ComputerName = $env:COMPUTERNAME
-									
 									$dtable.Rows.Add($nRow)
 								}
 								return $dtable
-								
 							}
 						}
 						else
@@ -286,14 +280,13 @@ public static extern bool LookupPrivilegeDisplayName(
 						Remove-Item $TemplateFilename, $LogFilename -ErrorAction SilentlyContinue
 					}
 					return Get-SecurityPolicy
-				} -computer $ComputerName -HideComputerName | Select-Object * -ExcludeProperty RunspaceID, PSShowComputerName, PSComputerName -Unique
+				} -ArgumentList $VerbosePreference -computer $ComputerName -HideComputerName | Select-Object * -ExcludeProperty RunspaceID, PSShowComputerName, PSComputerName -Unique
 			} #endregion Non-LocalMachine
 			else #region LocalMachine
 			{
 				function Get-SecurityPolicy
 				{
 					#requires -version 2
-					
 					# Fail script if we can't find SecEdit.exe
 					$SecEdit = Join-Path ([Environment]::GetFolderPath([Environment+SpecialFolder]::System)) "SecEdit.exe"
 					if (-not (Test-Path $SecEdit))
@@ -301,7 +294,7 @@ public static extern bool LookupPrivilegeDisplayName(
 						Write-Error "File not found - '$SecEdit'" -Category ObjectNotFound
 						return
 					}
-					
+					Write-Verbose "Found Executable: $SecEdit"
 					# LookupPrivilegeDisplayName Win32 API doesn't resolve logon right display
 					# names, so use this hashtable
 					$UserLogonRights = @{
@@ -316,7 +309,6 @@ public static extern bool LookupPrivilegeDisplayName(
 						"SeRemoteInteractiveLogonRight"	    = "Allow log on through Remote Desktop Services"
 						"SeServiceLogonRight"			    = "Log on as a service"
 					}
-					
 					# Create type to invoke LookupPrivilegeDisplayName Win32 API
 					$Win32APISignature = @'
 [DllImport("advapi32.dll", SetLastError=true)]
@@ -329,7 +321,6 @@ public static extern bool LookupPrivilegeDisplayName(
 );
 '@
 					$AdvApi32 = Add-Type advapi32 $Win32APISignature -Namespace LookupPrivilegeDisplayName -PassThru
-					
 					# Use LookupPrivilegeDisplayName Win32 API to get display name of privilege
 					# (except for user logon rights)
 					function Get-PrivilegeDisplayName
@@ -372,7 +363,6 @@ public static extern bool LookupPrivilegeDisplayName(
 						$out = New-Object PSObject -Property $result | Select-Object $order
 						return $out
 					}
-					
 					# Translates a SID in the form *S-1-5-... to its account name;
 					function Get-AccountName
 					{
@@ -386,7 +376,6 @@ public static extern bool LookupPrivilegeDisplayName(
 						}
 						catch { $principal }
 					}
-					
 					$TemplateFilename = Join-Path ([IO.Path]::GetTempPath()) ([IO.Path]::GetRandomFileName())
 					$LogFilename = Join-Path ([IO.Path]::GetTempPath()) ([IO.Path]::GetRandomFileName())
 					$StdOut = & $SecEdit /export /cfg $TemplateFilename /areas USER_RIGHTS /log $LogFilename
@@ -404,17 +393,14 @@ public static extern bool LookupPrivilegeDisplayName(
 							$Principals = $_.Matches[0].Groups[2].Value -split ','
 							foreach ($Principal in $Principals)
 							{
-								
 								$nRow = $dtable.NewRow()
 								$nRow.Privilege = $Privilege
 								$nRow.PrivilegeName = Get-PrivilegeDisplayName $Privilege
 								$nRow.Principal = Get-AccountName $Principal
 								$nRow.ComputerName = $env:COMPUTERNAME
-								
 								$dtable.Rows.Add($nRow)
 							}
 							return $dtable
-							
 						}
 					}
 					else
@@ -472,13 +458,12 @@ public static extern bool LookupPrivilegeDisplayName(
 	}
 	else
 	{
-	 <# Edit line 482 to modify the default command run when this script is executed.
-	   Example for output multiple servers to a text file: 
-	   	 Get-UserRights -ComputerName MS01-2019, IIS-2019 -FileOutputPath C:\Temp -FileOutputType Text
-
-	   Example for gathering locally:
-	   	 Get-UserRights
-	   #>
+     <# Edit line 467 to modify the default command run when this script is executed.
+       Example for output multiple servers to a text file: 
+         Get-UserRights -ComputerName MS01-2019, IIS-2019 -FileOutputPath C:\Temp -FileOutputType Text
+       Example for gathering locally:
+         Get-UserRights
+       #>
 		Get-UserRights
 	}
 }
