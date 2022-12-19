@@ -1,6 +1,6 @@
 #Modified by: Blake Drumm (blakedrumm@microsoft.com), Murat Coskun (coskunmurat@microsoft.com)
 #Collecting Host certificates from the VMM server's trusted people store
-$SCCerts = Get-ChildItem "Cert:\LocalMachine\TrustedPeople"
+$SCCerts = Get-ChildItem "Cert:\LocalMachine\TrustedPeople" | Sort-Object
 [bool]$Reassociate = $false
 
 #Request VMM administrator credentials for Invoke-Command against Hosts
@@ -11,37 +11,70 @@ if ($Reassociate)
 
 if ($SCCerts.count -gt 0)
 {
+	$OverallCertCount = $SCCerts.Count
+	$i = 0
 	foreach ($SCCert in $SCCerts)
 	{
-		Write-Host "Connecting to host $($SCCert.DnsNameList)" -ForegroundColor Gray
+		$i++
+		$i = $i
+		Write-Host "($i/$OverallCertCount) Connecting to host $($SCCert.DnsNameList)" -ForegroundColor Gray
 		if ($SCCert.FriendlyName -like 'SCVMM_CERTIFICATE_KEY_CONTAINER*')
 		{
-			Write-Host "Getting the Host Certificate" -ForegroundColor Gray
-			$ClientCerts = Invoke-Command -ComputerName $SCCert.DNSNameList -ScriptBlock {
-				Get-ChildItem "Cert:\LocalMachine\My" | Where-Object {$_.FriendlyName -eq  "SCVMM_CERTIFICATE_KEY_CONTAINER$($ENV:COMPUTERNAME).$($ENV:USERDNSDOMAIN)"};
-			}
-			Write-Host "Comparing Host and VMM Cerificates" -ForegroundColor Gray
-			if ($ClientCerts.Thumbprint -ne $SCCert.Thumbprint)
+			Write-Host "`t`tGetting the Host Certificate" -ForegroundColor Gray
+			try
 			{
-				Write-Host "The Thumbprint don't match" -ForegroundColor Red
-				Write-Host "Host Cert Thumbprint: $($ClientCerts.Thumbprint)" -ForegroundColor DarkRed
-				Write-Host "VMM Server Cert Thumbprint: $($SCCert.Thumbprint)" -ForegroundColor DarkRed
+				$ClientCerts = Invoke-Command -ComputerName $SCCert.DNSNameList -ErrorAction Stop -ScriptBlock {
+					Get-ChildItem "Cert:\LocalMachine\My" | Where-Object {$_.FriendlyName -eq  "SCVMM_CERTIFICATE_KEY_CONTAINER$(([System.Net.Dns]::GetHostByName($env:computerName)).HostName)"};
+				}
+			}
+			catch
+			{
+				Write-Warning "Unable to connect to $($SCCert.DNSNameList), skipping"
+				Write-Host ' '
+				continue
+			}
+			Write-Host "`t`tComparing Host and VMM Cerificates" -ForegroundColor Gray
+			if ($($ClientCerts.Thumbprint | Select-Object -First 1) -notmatch $($SCCert.Thumbprint | Select-Object -First 1))
+			{
+				Write-Host "`t`tThe Thumbprint doesn't match" -ForegroundColor Red
+				Write-Host "`t`t   Host Cert Thumbprint:       $($ClientCerts.Thumbprint | Select-Object -First 1)" -ForegroundColor Red
+				Write-Host "`t`t   VMM Server Cert Thumbprint: $($SCCert.Thumbprint)" -ForegroundColor Red
 				if ($Reassociate)
 				{
-					Write-Host "Reassociating the host with VMM to sync the cert" -ForegroundColor Yellow
+					Write-Host "`t`tReassociating the host with VMM to sync the cert" -ForegroundColor Yellow
 					Get-ScvmmManagedcomputer -ComputerName $ClientCerts.PSComputerName | Register-SCVMMManagedComputer -Credential $cred
 				}
 			}
 			else
 			{
-				Write-Host "Certificates Match" -ForegroundColor Green
+				Write-Host "`t`tCertificates Match" -ForegroundColor Green
 			}
-			Write-Host ""
+			if ($ClientCerts.NotAfter)
+			{
+				if ($($ClientCerts.NotAfter | Select-Object -First 1) -ge $(Date))
+				{
+					Write-Host "`t`tExpiration: $($ClientCerts.NotAfter | Select-Object -First 1)" -ForegroundColor Green
+				}
+				elseif ($($ClientCerts.NotAfter | Select-Object -First 1) -lt $(Date))
+				{
+					Write-Host "`t`tExpired: $($ClientCerts.NotAfter | Select-Object -First 1)" -ForegroundColor Red
+				}
+				else
+				{
+					Write-Host "`t`tUnknown issue, cannot detect Expiration" -ForegroundColor Yellow
+				}
+			}
+			else
+			{
+				Write-Host "`t`tUnable to detect Expiration" -ForegroundColor Yellow
+			}
+			
+			
 		}
+		Write-Host ' '
 	}
 }
 else
 {
 	Write-Host "Did not find any certificates for SCVMM!" -ForegroundColor Red
-} 
-
+}
