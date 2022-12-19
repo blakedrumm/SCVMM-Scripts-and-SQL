@@ -9,6 +9,18 @@ if ($Reassociate)
 	$cred = Get-Credential
 }
 
+$FolderName = "C:\Temp\"
+if (Test-Path $FolderName)
+{
+	Write-Verbose "C:\Temp folder exists skipping"
+}
+else
+{
+	#PowerShell Create directory if not exists
+	New-Item $FolderName -ItemType Directory
+	Write-Host "Temp folder created on C:\ successfully" -BackgroundColor Green -ForegroundColor Black
+}
+
 function Write-Console
 {
 	param
@@ -33,7 +45,7 @@ function Write-Console
 	{
 		Write-Output $Text
 	}
-	$Text | Out-File C:\Temp\SCVMM-CertChecker-Output.txt
+	$Text | Out-File $FolderName\SCVMM-CertChecker-Output.txt -ErrorAction SilentlyContinue
 }
 
 if ($SCCerts.count -gt 0)
