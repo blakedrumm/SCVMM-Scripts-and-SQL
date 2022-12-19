@@ -9,7 +9,7 @@ if ($Reassociate)
 	$cred = Get-Credential
 }
 
-$FolderName = "C:\Temp\"
+$FolderName = "C:\Temp"
 if (Test-Path $FolderName)
 {
 	Write-Verbose "C:\Temp folder exists skipping"
@@ -120,4 +120,5 @@ else
 {
 	Write-Console "Did not find any certificates for SCVMM!" -ForegroundColor Red
 }
-Write-Host "Completed writing output to file: '$FolderName\SCVMM-CertChecker-Output.txt' @ $(Get-Date)"
+$text = "`nCompleted writing output to file: '$FolderName\SCVMM-CertChecker-Output.txt' - $(Get-Date)"
+Write-Console $text -ForegroundColor Green
