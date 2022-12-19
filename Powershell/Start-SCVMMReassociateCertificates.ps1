@@ -72,5 +72,5 @@ else
 			Write-Output "--------------------------------------------------------------------------" | Out-File C:\temp\Each-ManagedHost-SelfSignedCertificate.txt -Append;
 		}
 	}
-	write-host "The result has been copied to Each-ManagedHost-SelfSignedCertificate.txt" -BackgroundColor Green -ForegroundColor Black;
+	write-host "Completed writing to Output file: 'C:\temp\Each-ManagedHost-SelfSignedCertificate.txt'" -BackgroundColor Green -ForegroundColor Black;
 }
