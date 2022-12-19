@@ -120,4 +120,4 @@ else
 {
 	Write-Console "Did not find any certificates for SCVMM!" -ForegroundColor Red
 }
-Write-Host "Completed writing output to file: '$FolderName\SCVMM-CertChecker-Output.txt'"
+Write-Host "Completed writing output to file: '$FolderName\SCVMM-CertChecker-Output.txt' @ $(Get-Date)"
