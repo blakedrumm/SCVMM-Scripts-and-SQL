@@ -21,6 +21,9 @@ else
 	Write-Host "Temp folder created on C:\ successfully" -BackgroundColor Green -ForegroundColor Black
 }
 
+Write-Host "Creating new file: '$FolderName\SCVMM-CertChecker-Output.txt'" -ForegroundColor Green
+Write-Output "Starting script - $(Get-Date)" | Out-File $FolderName\SCVMM-CertChecker-Output.txt
+
 function Write-Console
 {
 	param
@@ -45,7 +48,7 @@ function Write-Console
 	{
 		Write-Output $Text
 	}
-	$Text | Out-File $FolderName\SCVMM-CertChecker-Output.txt -ErrorAction SilentlyContinue
+	$Text | Out-File $FolderName\SCVMM-CertChecker-Output.txt -Append -ErrorAction SilentlyContinue
 }
 
 if ($SCCerts.count -gt 0)
