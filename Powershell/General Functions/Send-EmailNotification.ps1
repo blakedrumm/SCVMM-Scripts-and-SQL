@@ -7,7 +7,6 @@
         PSCredential objects. Additionally, this function ensures secure email transmission through the enforcement of SSL/TLS protocols for SMTP connections and by handling passwords exclusively as secure strings. It also supports sending emails with 
         attachments and HTML content, catering to a variety of messaging needs.
 
-        
     .PARAMETER EmailUsername
         The username for the SMTP server.
 
@@ -59,7 +58,7 @@
     .CREATED
         April 23rd, 2024
 
-    .LASTMODIFIED
+    .MODIFIED
         April 30th, 2024
 
     .LINK
